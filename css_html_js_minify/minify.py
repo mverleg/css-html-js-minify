@@ -18,7 +18,8 @@ from datetime import datetime
 from functools import partial
 from hashlib import sha1
 from multiprocessing import Pool, cpu_count
-from subprocess import getoutput
+from multiprocessing.dummy import Process
+from subprocess import Popen, PIPE, STDOUT
 from time import sleep
 
 from .css_minifier import css_minify
@@ -300,8 +301,9 @@ def main():
     else:
         log.critical("File or folder not found,or cant be read,or I/O Error.")
         sys.exit(1)
-    if args.after and getoutput:
-        log.info(getoutput(str(args.after)))
+    if args.after:
+        out = Popen(str(args.after), stdout=PIPE, stderr=STDOUT).communicate()
+        log.info(str(out))
     log.info('\n {0} \n Files Processed: {1}.'.format('-' * 80, list_of_files))
     log.info('Number of Files Processed: {0}.'.format(
         len(list_of_files) if isinstance(list_of_files, tuple) else 1))
